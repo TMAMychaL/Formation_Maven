@@ -1,0 +1,7 @@
+fr\mychal\service\ToDoService.class
+fr\mychal\controller\ToDoController.class
+fr\mychal\exception\DAOException.class
+fr\mychal\dao\ToDoDao.class
+fr\mychal\service\impl\ToDoServiceImpl.class
+fr\mychal\model\ToDo.class
+fr\mychal\exception\ServiceException.class

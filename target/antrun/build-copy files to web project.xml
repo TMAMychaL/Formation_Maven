@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project name="maven-antrun-" default="copy files to web project"  >
+<target name="copy files to web project">
+  <copy file="C:\Users\Stagiaire\Desktop\Formation\workspace\projet-web\target\projet-web.war" tofile="C:\apache-tomcat-7.0.52\projet-web.war"/>
+</target>
+</project>

@@ -1,0 +1,264 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>fr.mychal</groupId>
+	<artifactId>projet-web</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>war</packaging>
+
+	<name>projet-web</name>
+	<description>Ceci est un projet web</description>
+
+	<!-- Propriétés du projet voir utilisable dans les sources du projet -->
+	<properties>
+		<encoding>UTF-8</encoding>
+		<version.java>1.7</version.java>
+		<version.hibernate>4.3.1.Final</version.hibernate>
+		<version.junit>4.11</version.junit>
+		<version.spring>4.0.1.RELEASE</version.spring>
+		<version.spring.data>1.4.3.RELEASE</version.spring.data>
+		<version.compiler>3.1</version.compiler>
+	</properties>
+
+	<!-- Fake utilisé pour obtenir le buildnumber -->
+    <scm>
+        <connection>scm:svn:http://127.0.0.1/dummy</connection>
+        <developerConnection>scm:svn:https://127.0.0.1/dummy</developerConnection>
+        <tag>HEAD</tag>
+        <url>http://127.0.0.1/dummy</url>
+    </scm>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>commons-dbcp</groupId>
+			<artifactId>commons-dbcp</artifactId>
+			<version>1.4</version>
+			<scope>runtime</scope>
+		</dependency>
+
+		<!-- Hibernate -->
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-entitymanager</artifactId>
+			<version>${version.hibernate}</version>
+		</dependency>
+
+		<!-- Spring -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-webmvc</artifactId>
+			<version>${version.spring}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-orm</artifactId>
+			<version>${version.spring}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-aop</artifactId>
+			<version>${version.spring}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.data</groupId>
+			<artifactId>spring-data-jpa</artifactId>
+			<version>${version.spring.data}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>jstl</artifactId>
+			<version>1.2</version>
+		</dependency>
+
+	</dependencies>
+
+	<profiles>
+		<profile>
+			<id>dev</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+
+			<properties>
+				<database.url>jdbc:hsqldb:mem:mydb</database.url>
+				<database.user>root</database.user>
+				<database.password>root</database.password>
+				<datasource.driverClassName>org.hsqldb.jdbcDriver</datasource.driverClassName>
+				<jpa.database>HSQL</jpa.database>
+			</properties>
+
+			<dependencies>
+				<dependency>
+					<groupId>org.hsqldb</groupId>
+					<artifactId>hsqldb</artifactId>
+					<version>2.3.1</version>
+				</dependency>
+			</dependencies>
+
+		</profile>
+
+		<profile>
+			<id>prod</id>
+
+			<properties>
+				<database.url>jdbc:mysql//localhost:3306/baseprod</database.url>
+				<database.user>root</database.user>
+				<database.password>toto</database.password>
+				<datasource.driverClassName>com.mysql.jdbc.Driver</datasource.driverClassName>
+				<jpa.database>MYSQL</jpa.database>
+			</properties>
+
+			<dependencies>
+				<dependency>
+					<groupId>mysql</groupId>
+					<artifactId>mysql-connector-java</artifactId>
+					<version>5.1.29</version>
+				</dependency>
+			</dependencies>
+
+		</profile>
+
+	</profiles>
+
+	<build>
+		<finalName>${project.name}</finalName>
+
+		<!-- Goal par defaut -->
+		<defaultGoal>clean package</defaultGoal>
+
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+
+		<!-- Plugin -->
+		<!-- Ici on force la version de java -->
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${version.compiler}</version>
+				<configuration>
+					<source>${version.java}</source>
+					<target>${version.java}</target>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>buildnumber-maven-plugin</artifactId>
+				<version>1.2</version>
+				<executions>
+					<execution>
+						<phase>validate</phase>
+						<goals>
+							<goal>create</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<doCheck>false</doCheck>
+					<doUpdate>false</doUpdate>
+					<!-- <revisionOnScmFailure>6.6.6</revisionOnScmFailure> -->
+					<format>{0,number}.{1,number}.{2,number}</format>
+					<items>
+						<item>buildNumber0</item>
+						<item>buildNumber1</item>
+						<item>buildNumber2</item>
+					</items>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>2.4</version>
+				<configuration>
+				
+					<!-- Mets à jour le manifest du war et le créé si necessaire, et met le buildnumber dedans -->
+					<archive>
+						<manifest>
+							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+						</manifest>
+						<manifestEntries>
+							<Implementation-Build>${buildNumber}</Implementation-Build>
+						</manifestEntries>
+					</archive>
+					
+					<!-- Permet d'aller chercher spécifiquement un répertoire pour les ressources -->
+					<webResources>
+						<resource>
+							<directory>src/main/resources/dev</directory>
+							<targetPath>WEB-INF/classes</targetPath>
+						</resource>
+					</webResources>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.7</version>
+				<executions>
+					<execution>
+						<id>ant-copy</id>
+						<phase>install</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<target name="copy files to web project">
+								<copy file="${project.build.directory}\${project.name}.war"
+									tofile="C:\apache-tomcat-7.0.52\${project.name}.war" />
+							</target>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.tomcat.maven</groupId>
+				<artifactId>tomcat7-maven-plugin</artifactId>
+				<!-- or if you want to use tomcat 6.x <artifactId>tomcat6-maven-plugin</artifactId> -->
+				<version>2.2</version>
+				<configuration>
+					<!-- http port -->
+					<!-- <port>9090</port> -->
+					<server>tomcat</server>
+				</configuration>
+
+				<executions>
+					<execution>
+						<id>undeploy-tomcat</id>
+						<phase>package</phase>
+						<goals>
+							<goal>undeploy</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>deploy-tomcat</id>
+						<phase>install</phase>
+						<goals>
+							<goal>deploy-only</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- <plugin> <groupId>org.codehaus.mojo</groupId> <artifactId>exec-maven-plugin</artifactId> 
+				<version>1.2.1</version> <executions> <execution> <id>execshell</id> <phase>package</phase> 
+				<goals> <goal>exec</goal> </goals> <configuration> <executable>C:\Users\Stagiaire\Desktop\Formation\script.bat</executable> 
+				<arguments> <argument>${env.JAVA_HOME}</argument> <argument>${superToto}</argument> 
+				</arguments> </configuration> </execution> </executions> </plugin> -->
+		</plugins>
+	</build>
+
+</project>
